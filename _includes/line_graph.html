@@ -1,0 +1,34 @@
+<p id="income-share-graph">
+</p>
+
+<style>
+.line {
+  fill: none;
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+
+.area {
+  fill: #969696;
+}
+</style>
+
+<script>
+
+d3.csv("{{ "/data/top-decile-income-share-us.csv" | prepend: site.baseurl }}",
+       function (data) {
+           var formatDate = d3.time.format("%Y");
+
+           var chart = liquidmon.timeSeriesChart()
+                                .x(function(d) { return formatDate.parse(d.date); })
+                                .y(function(d) { return +d.percent; })
+                                .height(240)
+                                .width(800);
+
+           d3.select("#income-share-graph")
+               .datum(data)
+             .call(chart);
+       });
+
+</script>
+

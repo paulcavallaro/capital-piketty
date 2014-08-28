@@ -6,15 +6,18 @@ var liquidmon = {};
 // with modifications
 
   liquidmon.timeSeriesChart = function timeSeriesChart() {
-    var margin = {top: 20, right: 20, bottom: 20, left: 30},
+    var margin = {top: 20, right: 20, bottom: 30, left: 50},
     width = 760,
     height = 120,
     xValue = function(d) { return d[0]; },
     yValue = function(d) { return d[1]; },
     xScale = d3.time.scale(),
     yScale = d3.scale.linear(),
+    yTicks = 8,
+    yFormat = function(d) { return yScale.tickFormat(yTicks, ".1p")(d/100.0); },
     xAxis = d3.svg.axis().scale(xScale).orient("bottom").tickSize(6, 0),
-    yAxis = d3.svg.axis().scale(yScale).orient("left").tickSize(6, 0),
+    yAxis = d3.svg.axis().scale(yScale).orient("left")
+      .tickSize(3, 0).ticks(yTicks).tickFormat(yFormat),
     area = d3.svg.area().x(X).y1(Y),
     line = d3.svg.line().x(X).y(Y);
 
@@ -26,9 +29,6 @@ var liquidmon = {};
         data = data.map(function(d, i) {
           return [xValue.call(data, d, i), yValue.call(data, d, i)];
         });
-
-        //console.log(data.map(function(d, i) { return d[1]; }));
-        //console.log(data.map(function(d, i) { return d[0]; }));
 
         // Update the x-scale.
         xScale
@@ -50,6 +50,23 @@ var liquidmon = {};
         gEnter.append("path").attr("class", "line");
         gEnter.append("g").attr("class", "x axis");
         gEnter.append("g").attr("class", "y axis");
+
+        var focus = gEnter.append("g")
+          .attr("class", "focus")
+          .style("display", "none");
+
+        var marker = focus.append("circle")
+          .attr("r", 6)
+          .attr("class", "marker");
+
+        var tooltipOffsetXLeft = -100;
+        var tooltipOffsetXRight = 10;
+        var tooltipOffsetY = -18;
+        var tooltip = focus.append("text")
+          .attr("dx", tooltipOffsetXRight)
+          .attr("dy", tooltipOffsetY)
+          .style("pointer-events", "none")
+          .style("class", "tooltip");
 
         // Update the outer dimensions.
         svg .attr("width", width)
@@ -76,6 +93,42 @@ var liquidmon = {};
         g.select(".y.axis")
           .call(yAxis);
 
+
+        // Create custom bisector
+        var bisect = d3.bisector(function(d) {
+          return d[0];
+        }).right;
+
+        // Add mouse event handlers for marker
+        svg.on("mouseover", function() {
+          focus.style("display", "inherit");
+        }).on("mouseout", function() {
+          focus.style("display", "none")
+        }).on("mousemove", function() {
+          var mouse = d3.mouse(this);
+          mouse[0] = mouse[0] - margin.left;
+          var timestamp = xScale.invert(mouse[0]),
+          index = bisect(data, timestamp),
+          startDatum = data[index - 1],
+          endDatum = data[index];
+          if (startDatum) {
+            var cx = xScale(startDatum[0]);
+            var cy = yScale(startDatum[1]);
+
+            focus.attr("transform", "translate(" + cx + "," + cy + ")");
+
+            var magicFuckingNumber = 180;
+            if (cx + magicFuckingNumber > width) {
+              tooltip.attr("dx", tooltipOffsetXLeft);
+            } else {
+              tooltip.attr("dx", tooltipOffsetXRight);
+            }
+
+            var year = startDatum[0].getFullYear();
+            var value = startDatum[1] + "%";
+            tooltip.text(year + ", " + value);
+          }
+        });
       });
     }
 

@@ -20,4 +20,4 @@ where
 
 Piketty proposes a way to measure income inequality within a country by comparing the share of national income earned by the top decile, i.e., what percentage of national income did the top 10% of income earners earn. In a completely equal society, which we should note Piketty mentions as not a goal, we would expect the percentage to be 10%.
 
-We can visualize this idea with Piketty's data for the United States. Below is a graph of the top decile's percentage share of U.S. national income from 1910 to 2010. To read the chart, it says that in 1928, 49.3% of U.S. national income was earned by the top 10% of income earners.
+We can visualize this idea of income inequality with Piketty's data for the United States. Below is a graph of the top decile's percentage share of U.S. national income from 1910 to 2010. To read the chart, it says that in 1928, 49.3% of U.S. national income was earned by the top 10% of income earners.

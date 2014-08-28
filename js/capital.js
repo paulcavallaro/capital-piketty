@@ -10,11 +10,14 @@ var liquidmon = {};
     width = 760,
     height = 120,
     xValue = function(d) { return d[0]; },
+    // TODO(ptc) need a way to support multiple lines
     yValue = function(d) { return d[1]; },
     xScale = d3.time.scale(),
     yScale = d3.scale.linear(),
+    // TODO(ptc)  yTicks/yFormat/yAxis should be exposed
     yTicks = 8,
     yFormat = function(d) { return yScale.tickFormat(yTicks, ".1p")(d/100.0); },
+    tooltipFormat = function(d) { return yScale.tickFormat(yTicks, ".3p")(d/100.0); },
     xAxis = d3.svg.axis().scale(xScale).orient("bottom").tickSize(6, 0),
     yAxis = d3.svg.axis().scale(yScale).orient("left")
       .tickSize(3, 0).ticks(yTicks).tickFormat(yFormat),
@@ -111,9 +114,20 @@ var liquidmon = {};
           index = bisect(data, timestamp),
           startDatum = data[index - 1],
           endDatum = data[index];
-          if (startDatum) {
-            var cx = xScale(startDatum[0]);
-            var cy = yScale(startDatum[1]);
+
+          var datum;
+          if (!startDatum) {
+            datum = endDatum;
+          } else if (!endDatum) {
+            datum = startDatum;
+          } else {
+            datum = (timestamp - startDatum[0]) > (endDatum[0] - timestamp)
+              ? endDatum
+              : startDatum;
+          }
+          if (datum) {
+            var cx = xScale(datum[0]);
+            var cy = yScale(datum[1]);
 
             focus.attr("transform", "translate(" + cx + "," + cy + ")");
 
@@ -124,8 +138,8 @@ var liquidmon = {};
               tooltip.attr("dx", tooltipOffsetXRight);
             }
 
-            var year = startDatum[0].getFullYear();
-            var value = startDatum[1] + "%";
+            var year = datum[0].getFullYear();
+            var value = tooltipFormat(datum[1]);
             tooltip.text(year + ", " + value);
           }
         });
@@ -169,6 +183,25 @@ var liquidmon = {};
     chart.y = function(_) {
       if (!arguments.length) return yValue;
       yValue = _;
+      return chart;
+    };
+
+    chart.yScale = function(_) {
+      if (!arguments.length) return yScale;
+      yScale = _;
+      return chart;
+    };
+
+    chart.yFormat = function(_) {
+      if (!arguments.length) return yFormat;
+      yFormat = _;
+      yAxis.tickFormat(yFormat);
+      return chart;
+    };
+
+    chart.tooltipFormat = function(_) {
+      if (!arguments.length) return tooltipFormat;
+      tooltipFormat = _;
       return chart;
     };
 

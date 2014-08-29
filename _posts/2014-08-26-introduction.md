@@ -24,6 +24,6 @@ We can visualize this idea of income inequality with Piketty's data for the Unit
 
 {% include top_decile_income_graph.html %}
 
-#### National Capital to National Income Ratio in Germany
+#### National Capital to National Income Ratio in Europe
 
 {% include capital_income_ratio_europe_graph.html %}

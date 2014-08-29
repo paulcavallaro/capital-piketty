@@ -8,13 +8,43 @@
   stroke-width: 1.5px;
 }
 
-.area {
-  fill: #cccccc;
+.line.Britain {
+  stroke: #FF0000;
+}
+
+.Britain rect {
+  fill: #FF0000;
+}
+
+circle.marker.Britain {
+  stroke: #FF0000;
+}
+
+.line.Germany {
+  stroke: #000000;
+}
+
+.Germany rect {
+  fill: #000000;
+}
+
+circle.marker.Germany {
+  stroke: #000000;
+}
+
+.line.France {
+  stroke: #0000FF;
+}
+
+.France rect {
+  fill: #0000FF;
+}
+circle.marker.France {
+  stroke: #0000FF;
 }
 
 circle.marker {
   fill: #ffffff;
-  stroke: #fb5050;
   stroke-width: 1.5px;
 }
 
@@ -32,9 +62,13 @@ d3.csv("{{ "/data/capital-income-ratio-europe.csv" | prepend: site.baseurl }}",
        function (data) {
            var formatDate = d3.time.format("%Y");
 
-           var chart = liquidmon.timeSeriesChart()
+           var chart = liquidmon.multiTimeSeriesChart()
                                 .x(function(d) { return formatDate.parse(d.year); })
-                                .y(function(d) { return +d.Germany; })
+                                .ys({
+                                      "Germany" : function(d) { return +d.Germany; },
+                                      "France" : function(d) { return +d.France; },
+                                      "Britain" : function(d) { return +d.Britain; },
+                                })
                                 .yFormat(function(d) { return chart.yScale().tickFormat(this.yTicks, ".0f")(d); })
                                 .tooltipFormat(function(d) { return chart.yScale().tickFormat(this.yTicks, ".2f")(d); })
                                 .height(240)

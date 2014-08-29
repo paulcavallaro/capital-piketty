@@ -72,7 +72,7 @@ d3.csv("{{ "/data/capital-income-ratio-europe.csv" | prepend: site.baseurl }}",
                                 .yFormat(function(d) { return chart.yScale().tickFormat(this.yTicks, ".0f")(d); })
                                 .tooltipFormat(function(d) { return chart.yScale().tickFormat(this.yTicks, ".2f")(d); })
                                 .height(240)
-                                .width(800);
+                                .width(920);
 
            d3.select("#capital-income-ratio-graph")
                .datum(data)
